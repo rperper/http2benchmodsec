@@ -273,9 +273,9 @@ install_openssl(){
 
 install_nginxModSec(){
     pushd temp
-    install_pcre()
-    install_zlib()
-    install_openssl()
+    install_pcre
+    install_zlib
+    install_openssl
     git clone https://github.com/nginx/nginx.git
     git clone --depth 1 https://github.com/SpiderLabs/ModSecurity-nginx.git
     pushd nginx
