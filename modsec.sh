@@ -170,15 +170,35 @@ install_owasp(){
 }
 
 install_modsecurity(){
+    if [ -d /usr/local/modsecurity ] ; then
+        echoG "[OK] ModSecurity already installed"
+        return 0
+    fi
     pushd temp
     git clone --depth 1 -b v3/master --single-branch https://github.com/SpiderLabs/ModSecurity
     pushd ModSecurity
     git submodule init
     git submodule update
     ./build.sh
+    if [ $? -gt 0 ] ; then
+        fail_exit "[ERROR] Build of ModSecurity failed"
+        exit 1
+    fi
     ./configure
+    if [ $? -gt 0 ] ; then
+        fail_exit "[ERROR] Configure of ModSecurity failed"
+        exit 1
+    fi
     make
-    #make install
+    if [ $? -gt 0 ] ; then
+        fail_exit "[ERROR] Compile of ModSecurity failed"
+        exit 1
+    fi
+    make install
+    if [ $? -gt 0 ] ; then
+        fail_exit "[ERROR] Install of ModSecurity failed"
+        exit 1
+    fi
     popd +1
 }
 
@@ -186,8 +206,22 @@ install_nginxModSec(){
     pushd temp
     git clone https://github.com/nginx/nginx.git
     git clone --depth 1 https://github.com/SpiderLabs/ModSecurity-nginx.git
-    cd nginx
+    pushd nginx
     auto/configure --with-compat --add-dynamic-module=../ModSecurity-nginx --with-http_ssl_module --with-http_v2_module
+    if [ $? -gt 0 ] ; then
+        fail_exit "[ERROR] Configure of Nginx ModSecurity Module failed"
+        exit 1
+    fi
+    make
+    if [ $? -gt 0 ] ; then
+        fail_exit "[ERROR] Compile of Nginx failed"
+        exit 1
+    fi
+    make modules
+    if [ $? -gt 0 ] ; then
+        fail_exit "[ERROR] Compile of Nginx ModSecurity failed"
+        exit 1
+    fi
     popd +1
 }
 
