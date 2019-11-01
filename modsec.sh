@@ -164,8 +164,10 @@ validate_user(){
 install_prereq(){
     if [ ${OSNAME} = 'centos' ]; then
         yum group install "Development Tools" -y
+        yum install geoip geoip-devel yajl lmdb
     else
         apt install build-essential
+        apt install libgeoip1 libgeoip-dev geoip-bin libyajl-dev lmdb-utils
     fi    
 }
 
@@ -279,6 +281,7 @@ install_nginxModSec(){
     git clone https://github.com/nginx/nginx.git
     git clone --depth 1 https://github.com/SpiderLabs/ModSecurity-nginx.git
     pushd nginx
+    fail_exit_fatal "Don't actually run the configure yet" 1
     auto/configure --with-compat --add-dynamic-module=../ModSecurity-nginx --with-http_ssl_module --with-http_v2_module
     if [ $? -gt 0 ] ; then
         fail_exit "[ERROR] Configure of Nginx ModSecurity Module failed"
