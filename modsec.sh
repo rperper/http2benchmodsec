@@ -55,6 +55,14 @@ fail_exit(){
     echoR "${1}"
 }
 
+fail_exit_fatal(){
+    echoR "${1}"
+    if [ $# -gt 1 ] ; then
+        popd "+${2}"
+    fi
+    exit 1
+}
+
 check_system(){
     if [ -f /etc/redhat-release ] ; then
         grep -i fedora /etc/redhat-release >/dev/null 2>&1
@@ -153,6 +161,14 @@ validate_user(){
     fi
 }
 
+install_prereq(){
+    if [ ${OSNAME} = 'centos' ]; then
+        yum group install "Development Tools" -y
+    else
+        apt install build-essential
+    fi    
+}
+
 install_owasp(){
     if [ -d "$OWASP_DIR" ] ; then
         echoG "[OK] OWASP already installed"
@@ -181,29 +197,85 @@ install_modsecurity(){
     git submodule update
     ./build.sh
     if [ $? -gt 0 ] ; then
-        fail_exit "[ERROR] Build of ModSecurity failed"
-        exit 1
+        fail_exit_fatal "[ERROR] Build of ModSecurity failed" 1
     fi
     ./configure
     if [ $? -gt 0 ] ; then
-        fail_exit "[ERROR] Configure of ModSecurity failed"
-        exit 1
+        fail_exit_fatal "[ERROR] Configure of ModSecurity failed" 1
     fi
     make
     if [ $? -gt 0 ] ; then
-        fail_exit "[ERROR] Compile of ModSecurity failed"
-        exit 1
+        fail_exit_fatal "[ERROR] Compile of ModSecurity failed" 1
     fi
     make install
     if [ $? -gt 0 ] ; then
-        fail_exit "[ERROR] Install of ModSecurity failed"
-        exit 1
+        fail_exit_fatal "[ERROR] Install of ModSecurity failed" 1
     fi
     popd +1
 }
 
+install_pcre(){
+    wget ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.43.tar.gz
+    tar -zxf pcre-8.43.tar.gz
+    pushd pcre-8.43
+    ./configure
+    if [ $? -gt 0 ] ; then
+        fail_exit_fatal "[ERROR] Configure of pcre failed" 1
+    fi
+    make
+    if [ $? -gt 0 ] ; then
+        fail_exit_fatal "[ERROR] Make of pcre failed" 1
+    fi
+    make install
+    if [ $? -gt 0 ] ; then
+        fail_exit_fatal "[ERROR] Install of pcre failed" 1
+    fi
+    popd 
+}
+
+install_zlib(){
+    wget http://zlib.net/zlib-1.2.11.tar.gz
+    tar -zxf zlib-1.2.11.tar.gz
+    pushd zlib-1.2.11
+    ./configure
+    if [ $? -gt 0 ] ; then
+        fail_exit_fatal "[ERROR] Configure of zlib failed" 1
+    fi
+    make
+    if [ $? -gt 0 ] ; then
+        fail_exit_fatal "[ERROR] Build of zlib failed" 1
+    fi
+    make install
+    if [ $? -gt 0 ] ; then
+        fail_exit_fatal "[ERROR] Install of zlib failed" 1
+    fi
+    popd
+}
+
+install_openssl(){
+    wget http://www.openssl.org/source/openssl-1.1.1c.tar.gz
+    tar -zxf openssl-1.1.1c.tar.gz
+    pushd openssl-1.1.1c
+    ./Configure darwin64-x86_64-cc --prefix=/usr
+    if [ $? -gt 0 ] ; then
+        fail_exit_fatal "[ERROR] Configure of openssl failed" 1
+    fi
+    make
+    if [ $? -gt 0 ] ; then
+        fail_exit_fatal "[ERROR] Build of openssl failed" 1
+    fi
+    make install
+    if [ $? -gt 0 ] ; then
+        fail_exit_fatal "[ERROR] Install of openssl failed" 1
+    fi
+    popd
+}
+
 install_nginxModSec(){
     pushd temp
+    install_pcre()
+    install_zlib()
+    install_openssl()
     git clone https://github.com/nginx/nginx.git
     git clone --depth 1 https://github.com/SpiderLabs/ModSecurity-nginx.git
     pushd nginx
@@ -228,6 +300,7 @@ install_nginxModSec(){
 main(){
     validate_servers
     validate_user
+    install_prereq
     install_owasp
     install_modsecurity
     install_nginxModSec
