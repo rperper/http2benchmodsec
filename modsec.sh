@@ -164,7 +164,7 @@ validate_user(){
 install_prereq(){
     if [ ${OSNAME} = 'centos' ]; then
         yum group install "Development Tools" -y
-        yum install geoip geoip-devel yajl lmdb
+        yum install geoip geoip-devel yajl lmdb -y
     else
         apt install build-essential
         apt install libgeoip1 libgeoip-dev geoip-bin libyajl-dev lmdb-utils
