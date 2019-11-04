@@ -212,6 +212,11 @@ install_pcre(){
 }
 
 install_zlib(){
+    whereis libz.so.1|grep libz.so.1
+    if [ $? -eq 0 ] ; then
+        echoG "[OK] libz already installed and new enough version"
+        return 0
+    fi
     wget http://zlib.net/zlib-1.2.11.tar.gz
     tar -zxf zlib-1.2.11.tar.gz
     pushd zlib-1.2.11
@@ -252,6 +257,7 @@ install_openssl(){
     if [ $? -gt 0 ] ; then
         fail_exit_fatal "[ERROR] Install of openssl failed" 1
     fi
+    cp -pf /usr/local/ssl/bin/openssl /usr/local/bin
     popd
 }
 
@@ -289,6 +295,9 @@ install_modsecurity(){
 
 install_nginxModSec(){
     pushd temp
+    install_pcre
+    install_zlib
+    install_openssl
     git clone https://github.com/nginx/nginx.git
     git clone --depth 1 https://github.com/SpiderLabs/ModSecurity-nginx.git
     pushd nginx
