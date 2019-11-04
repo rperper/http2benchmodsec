@@ -187,35 +187,6 @@ install_owasp(){
     fi
 }
 
-install_modsecurity(){
-    if [ -d /usr/local/modsecurity ] ; then
-        echoG "[OK] ModSecurity already installed"
-        return 0
-    fi
-    pushd temp
-    git clone --depth 1 -b v3/master --single-branch https://github.com/SpiderLabs/ModSecurity
-    pushd ModSecurity
-    git submodule init
-    git submodule update
-    ./build.sh
-    if [ $? -gt 0 ] ; then
-        fail_exit_fatal "[ERROR] Build of ModSecurity failed" 1
-    fi
-    ./configure
-    if [ $? -gt 0 ] ; then
-        fail_exit_fatal "[ERROR] Configure of ModSecurity failed" 1
-    fi
-    make
-    if [ $? -gt 0 ] ; then
-        fail_exit_fatal "[ERROR] Compile of ModSecurity failed" 1
-    fi
-    make install
-    if [ $? -gt 0 ] ; then
-        fail_exit_fatal "[ERROR] Install of ModSecurity failed" 1
-    fi
-    popd +1
-}
-
 install_pcre(){
     wget ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.43.tar.gz
     tar -zxf pcre-8.43.tar.gz
@@ -273,11 +244,40 @@ install_openssl(){
     popd
 }
 
-install_nginxModSec(){
+install_modsecurity(){
+    if [ -d /usr/local/modsecurity ] ; then
+        echoG "[OK] ModSecurity already installed"
+        return 0
+    fi
     pushd temp
     install_pcre
     install_zlib
     install_openssl
+    git clone --depth 1 -b v3/master --single-branch https://github.com/SpiderLabs/ModSecurity
+    pushd ModSecurity
+    git submodule init
+    git submodule update
+    ./build.sh
+    if [ $? -gt 0 ] ; then
+        fail_exit_fatal "[ERROR] Build of ModSecurity failed" 1
+    fi
+    ./configure
+    if [ $? -gt 0 ] ; then
+        fail_exit_fatal "[ERROR] Configure of ModSecurity failed" 1
+    fi
+    make
+    if [ $? -gt 0 ] ; then
+        fail_exit_fatal "[ERROR] Compile of ModSecurity failed" 1
+    fi
+    make install
+    if [ $? -gt 0 ] ; then
+        fail_exit_fatal "[ERROR] Install of ModSecurity failed" 1
+    fi
+    popd +1
+}
+
+install_nginxModSec(){
+    pushd temp
     git clone https://github.com/nginx/nginx.git
     git clone --depth 1 https://github.com/SpiderLabs/ModSecurity-nginx.git
     pushd nginx
