@@ -234,8 +234,8 @@ install_openssl(){
     wget http://www.openssl.org/source/openssl-1.1.1c.tar.gz
     tar -zxf openssl-1.1.1c.tar.gz
     pushd openssl-1.1.1c
-    ./Configure darwin64-x86_64-cc --prefix=/usr
-    #./config
+    #./Configure darwin64-x86_64-cc --prefix=/usr
+    ./config --prefix=/usr --openssldir=/usr
     if [ $? -gt 0 ] ; then
         fail_exit_fatal "[ERROR] Configure of openssl failed" 1
     fi
