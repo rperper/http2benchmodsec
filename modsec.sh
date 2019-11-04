@@ -188,7 +188,7 @@ install_owasp(){
 }
 
 install_pcre(){
-    wget ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.43.tar.gz
+    wget ftp://ftp.pcre.org/pub/pcre/pcre-8.43.tar.gz
     tar -zxf pcre-8.43.tar.gz
     pushd pcre-8.43
     ./configure
