@@ -188,9 +188,8 @@ install_owasp(){
 }
 
 install_pcre(){
-    pcre-config --version|grep 8.
-    if [ $? -eq 0 ] ; then
-        echoG "[OK] pcre already installed and new enough version"
+    if [ -d pcre-8.43 ] ; then
+        echoG "[OK] pcre already downloaded"
         return 0
     fi
     wget ftp://ftp.pcre.org/pub/pcre/pcre-8.43.tar.gz
@@ -212,9 +211,8 @@ install_pcre(){
 }
 
 install_zlib(){
-    whereis libz.so.1|grep libz.so.1
-    if [ $? -eq 0 ] ; then
-        echoG "[OK] libz already installed and new enough version"
+    if [ -d zlib-1.2.11 ] ; then
+        echoG "[OK] libz already download"
         return 0
     fi
     wget http://zlib.net/zlib-1.2.11.tar.gz
@@ -301,8 +299,7 @@ install_nginxModSec(){
     git clone https://github.com/nginx/nginx.git
     git clone --depth 1 https://github.com/SpiderLabs/ModSecurity-nginx.git
     pushd nginx
-    fail_exit_fatal "Don't actually run the configure yet" 1
-    auto/configure --with-compat --add-dynamic-module=../ModSecurity-nginx --with-http_ssl_module --with-http_v2_module
+    auto/configure --with-compat --add-dynamic-module=../ModSecurity-nginx --with-http_ssl_module --with-http_v2_module --sbin-path=$NGDIR --conf-path=$NGDIR/nginx.conf --pid-path=/var/run --with-pcre=../pcre-8.43 --with-zlib=../zlib-1.2.11 --with-http_ssl_module --with-stream --with-mail=dynamic --add-module=/usr/build/nginx-rtmp-module --add-dynamic-module=$NGDIR/module
     if [ $? -gt 0 ] ; then
         fail_exit "[ERROR] Configure of Nginx ModSecurity Module failed"
         exit 1
@@ -315,6 +312,11 @@ install_nginxModSec(){
     make modules
     if [ $? -gt 0 ] ; then
         fail_exit "[ERROR] Compile of Nginx ModSecurity failed"
+        exit 1
+    fi
+    make install
+    if [ $? -gt 0 ] ; then
+        fail_exit "[ERROR] Install of Nginx ModSecurity failed"
         exit 1
     fi
     popd +1
