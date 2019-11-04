@@ -226,11 +226,16 @@ install_zlib(){
 }
 
 install_openssl(){
+    openssl version|grep 1.1
+    if [ $? -eq 0 ] ; then
+        echoG "[OK] openssl already installed and new enough version"
+        return 0
+    fi
     wget http://www.openssl.org/source/openssl-1.1.1c.tar.gz
     tar -zxf openssl-1.1.1c.tar.gz
     pushd openssl-1.1.1c
-    #./Configure darwin64-x86_64-cc --prefix=/usr
-    ./config
+    ./Configure darwin64-x86_64-cc --prefix=/usr
+    #./config
     if [ $? -gt 0 ] ; then
         fail_exit_fatal "[ERROR] Configure of openssl failed" 1
     fi
