@@ -292,6 +292,10 @@ install_modsecurity(){
 }
 
 install_nginxModSec(){
+    if [ -f $NGDIR/modules/ngx_http_modsecurity_module.so ] ; then
+        echoG 'Nginx modsecurity module already compiled and installed'
+        return 0
+    fi
     pushd temp
     install_pcre
     install_zlib
