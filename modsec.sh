@@ -188,6 +188,11 @@ install_owasp(){
 }
 
 install_pcre(){
+    pcre-config --version|grep 8.
+    if [ $? -eq 0 ] ; then
+        echoG "[OK] pcre already installed and new enough version"
+        return 0
+    fi
     wget ftp://ftp.pcre.org/pub/pcre/pcre-8.43.tar.gz
     tar -zxf pcre-8.43.tar.gz
     pushd pcre-8.43
@@ -235,7 +240,7 @@ install_openssl(){
     tar -zxf openssl-1.1.1c.tar.gz
     pushd openssl-1.1.1c
     #./Configure darwin64-x86_64-cc --prefix=/usr
-    ./config --prefix=/usr --openssldir=/usr
+    ./config --prefix=/usr/local/ssl --openssldir=/usr/local/ssl
     if [ $? -gt 0 ] ; then
         fail_exit_fatal "[ERROR] Configure of openssl failed" 1
     fi
