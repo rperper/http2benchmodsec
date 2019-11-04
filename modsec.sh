@@ -329,7 +329,7 @@ install_nginxModSec(){
     popd +1
 }
 
-config_nginxModSec{
+config_nginxModSec(){
     grep ngx_http_modsecurity_modules.so $NGDIR/nginx.conf
     if [ $? -eq 0 ] ; then
         echoG "Nginx already configured for modsecurity"
