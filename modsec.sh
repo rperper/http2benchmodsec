@@ -299,7 +299,8 @@ install_nginxModSec(){
     git clone https://github.com/nginx/nginx.git
     git clone --depth 1 https://github.com/SpiderLabs/ModSecurity-nginx.git
     pushd nginx
-    auto/configure --with-compat --add-dynamic-module=../ModSecurity-nginx --with-http_ssl_module --with-http_v2_module --sbin-path=$NGDIR --conf-path=$NGDIR/nginx.conf --pid-path=/var/run --with-pcre=../pcre-8.43 --with-zlib=../zlib-1.2.11 --with-http_ssl_module --with-stream --with-mail=dynamic --add-module=/usr/build/nginx-rtmp-module --add-dynamic-module=$NGDIR/module
+    git checkout default
+    auto/configure --with-compat --add-dynamic-module=../ModSecurity-nginx --with-http_ssl_module --with-http_v2_module --sbin-path=$NGDIR --conf-path=$NGDIR/nginx.conf --pid-path=/var/run --with-pcre=../pcre-8.43 --with-zlib=../zlib-1.2.11 --with-http_ssl_module --with-stream --with-mail=dynamic 
     if [ $? -gt 0 ] ; then
         fail_exit "[ERROR] Configure of Nginx ModSecurity Module failed"
         exit 1
