@@ -187,150 +187,21 @@ install_owasp(){
     fi
 }
 
-install_pcre(){
-    if [ -d pcre-8.43 ] ; then
-        echoG "[OK] pcre already downloaded"
-        return 0
-    fi
-    wget ftp://ftp.pcre.org/pub/pcre/pcre-8.43.tar.gz
-    tar -zxf pcre-8.43.tar.gz
-    pushd pcre-8.43
-    ./configure
-    if [ $? -gt 0 ] ; then
-        fail_exit_fatal "[ERROR] Configure of pcre failed" 1
-    fi
-    make
-    if [ $? -gt 0 ] ; then
-        fail_exit_fatal "[ERROR] Make of pcre failed" 1
-    fi
-    make install
-    if [ $? -gt 0 ] ; then
-        fail_exit_fatal "[ERROR] Install of pcre failed" 1
-    fi
-    popd 
-}
-
-install_zlib(){
-    if [ -d zlib-1.2.11 ] ; then
-        echoG "[OK] libz already download"
-        return 0
-    fi
-    wget http://zlib.net/zlib-1.2.11.tar.gz
-    tar -zxf zlib-1.2.11.tar.gz
-    pushd zlib-1.2.11
-    ./configure
-    if [ $? -gt 0 ] ; then
-        fail_exit_fatal "[ERROR] Configure of zlib failed" 1
-    fi
-    make
-    if [ $? -gt 0 ] ; then
-        fail_exit_fatal "[ERROR] Build of zlib failed" 1
-    fi
-    make install
-    if [ $? -gt 0 ] ; then
-        fail_exit_fatal "[ERROR] Install of zlib failed" 1
-    fi
-    popd
-}
-
-install_openssl(){
-    openssl version|grep 1.1
-    if [ $? -eq 0 ] ; then
-        echoG "[OK] openssl already installed and new enough version"
-        return 0
-    fi
-    wget http://www.openssl.org/source/openssl-1.1.1c.tar.gz
-    tar -zxf openssl-1.1.1c.tar.gz
-    pushd openssl-1.1.1c
-    #./Configure darwin64-x86_64-cc --prefix=/usr
-    ./config --prefix=/usr/local/ssl --openssldir=/usr/local/ssl
-    if [ $? -gt 0 ] ; then
-        fail_exit_fatal "[ERROR] Configure of openssl failed" 1
-    fi
-    make
-    if [ $? -gt 0 ] ; then
-        fail_exit_fatal "[ERROR] Build of openssl failed" 1
-    fi
-    make install
-    if [ $? -gt 0 ] ; then
-        fail_exit_fatal "[ERROR] Install of openssl failed" 1
-    fi
-    cp -pf /usr/local/ssl/bin/openssl /usr/local/bin
-    popd
-}
-
-install_modsecurity(){
-    if [ -d /usr/local/modsecurity ] ; then
-        echoG "[OK] ModSecurity already installed"
-        return 0
-    fi
-    pushd temp
-    install_pcre
-    install_zlib
-    install_openssl
-    git clone --depth 1 -b v3/master --single-branch https://github.com/SpiderLabs/ModSecurity
-    pushd ModSecurity
-    git submodule init
-    git submodule update
-    ./build.sh
-    if [ $? -gt 0 ] ; then
-        fail_exit_fatal "[ERROR] Build of ModSecurity failed" 1
-    fi
-    ./configure
-    if [ $? -gt 0 ] ; then
-        fail_exit_fatal "[ERROR] Configure of ModSecurity failed" 1
-    fi
-    make
-    if [ $? -gt 0 ] ; then
-        fail_exit_fatal "[ERROR] Compile of ModSecurity failed" 1
-    fi
-    make install
-    if [ $? -gt 0 ] ; then
-        fail_exit_fatal "[ERROR] Install of ModSecurity failed" 1
-    fi
-    popd +1
-}
-
 install_nginxModSec(){
     if [ -f $NGDIR/modules/ngx_http_modsecurity_module.so ] ; then
         echoG 'Nginx modsecurity module already compiled and installed'
         return 0
     fi
-    pushd temp
-    install_pcre
-    install_zlib
-    install_openssl
-    git clone https://github.com/nginx/nginx.git
-    git clone --depth 1 https://github.com/SpiderLabs/ModSecurity-nginx.git
-    pushd nginx
-    git checkout default
-    auto/configure --with-compat --add-dynamic-module=../ModSecurity-nginx --prefix=$NGDIR --sbin-path=/usr/sbin/nginx --with-http_ssl_module --with-http_v2_module --conf-path=$NGDIR/nginx.conf --pid-path=/run/nginx.pid --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --with-pcre=../pcre-8.43 --with-zlib=../zlib-1.2.11 --with-http_ssl_module --with-stream --with-mail=dynamic 
-    if [ $? -gt 0 ] ; then
-        fail_exit "[ERROR] Configure of Nginx ModSecurity Module failed"
-        exit 1
+    if [ ! -x "${SCRIPTPATH}/install_nginx_modsec.sh" ] ; then
+        fail_exit "[ERROR] Missing ${SCRIPTPATH}/install_owasp.sh script"
     fi
-    make
+    PGM="${SCRIPTPATH}/install_nginx_modsec.sh"
+    PARM2="${TEMP_DIR}"
+    PARM1="${OWASP_DIR}"
+    $PGM $PARM1 $PARM2
     if [ $? -gt 0 ] ; then
-        fail_exit "[ERROR] Compile of Nginx failed"
-        exit 1
+        fail_exit "install Nginx failed"
     fi
-    make modules
-    if [ $? -gt 0 ] ; then
-        fail_exit "[ERROR] Compile of Nginx ModSecurity failed"
-        exit 1
-    fi
-    cp $NGDIR/nginx.conf $NGDIR/nginx.conf.preinstall
-    cp $NGDIR/conf.d/default.conf $NGDIR/conf.d/default.conf.preinstall
-    make install
-    if [ $? -gt 0 ] ; then
-        cp $NGDIR/nginx.conf.preinstall $NGDIR/nginx.conf
-        cp $NGDIR/conf.d/default.conf.preinstall $NGDIR/conf.d/default.conf
-        fail_exit "[ERROR] Install of Nginx ModSecurity failed"
-        exit 1
-    fi
-    cp $NGDIR/nginx.conf.preinstall $NGDIR/nginx.conf
-    cp $NGDIR/conf.d/default.conf.preinstall $NGDIR/conf.d/default.conf
-    popd +1
 }
 
 config_nginxModSec(){
@@ -339,12 +210,28 @@ config_nginxModSec(){
         echoG "Nginx already configured for modsecurity"
         return 0
     fi
-    cp -f $NGDIR/nginx.conf $NGDIR/nginx.conf.nomodsec
-    cp -f $NGDIR/conf.d/default.conf $NGDIR/conf.d/default.conf.nomodsec
-    cp -f $NGDIR/conf.d/wordpress.conf $NGDIR/conf.d/wordpress.conf.nomodsec
-    sed -i '1iload_module modules/ngx_http_modsecurity_module.so;' $NGDIR/nginx.conf
-    sed -i "s=server {=server {\n    modsecurity on;\n    modsecurity_rules_file $OWASP_DIR/modsec_includes.conf;=g" $NGDIR/conf.d/default.conf
-    sed -i "s=server {=server {\n    modsecurity on;\n    modsecurity_rules_file $OWASP_DIR/modsec_includes.conf;=g" $NGDIR/conf.d/wordpress.conf
+    PGM="${SCRIPTPATH}/config_nginx_modsec.sh"
+    PARM2="${TEMP_DIR}"
+    PARM1="${OWASP_DIR}"
+    $PGM $PARM1 $PARM2 $NGDIR
+    if [ $? -gt 0 ] ; then
+        fail_exit "config Nginx failed"
+    fi
+}
+
+config_lswsModSec(){
+    grep '<enableCensorship>1</enableCensorship>' $LSDIR/conf/httpd_config.xml
+    if [ $? -eq 0 ] ; then
+        echoG "LSWS already configured for modsecurity"
+        return 0
+    fi
+    PGM="${SCRIPTPATH}/config_lsws_modsec.sh"
+    PARM2="${TEMP_DIR}"
+    PARM1="${OWASP_DIR}"
+    $PGM $PARM1 $PARM2 $LSDIR
+    if [ $? -gt 0 ] ; then
+        fail_exit "config lsws failed"
+    fi
 }
 
 main(){
@@ -352,10 +239,8 @@ main(){
     validate_user
     install_prereq
     install_owasp
-    install_modsecurity
     install_nginxModSec
     config_nginxModSec
-    #config_olsModSec
-    #config_lswsModSec
+    config_lswsModSec
 }
 main
