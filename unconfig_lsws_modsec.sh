@@ -53,4 +53,4 @@ unconfig_lswsModSec(){
     cp -f $LSDIR/conf/httpd_config.xml.nomodsec $LSDIR/conf/httpd_config.xml
 }
 
-unconfig_lsws_modsec
+unconfig_lswsModSec

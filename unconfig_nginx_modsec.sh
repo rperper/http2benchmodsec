@@ -55,4 +55,4 @@ unconfig_nginxModSec(){
     cp -f $NGDIR/conf.d/wordpress.conf.nomodsec $NGDIR/conf.d/wordpress.conf 
 }
 
-unconfig_nginx_modsec
+unconfig_nginxModSec
