@@ -196,8 +196,8 @@ install_nginxModSec(){
         fail_exit_fatal "[ERROR] Missing ${SCRIPTPATH}/install_nginx_modsec.sh script"
     fi
     PGM="${SCRIPTPATH}/install_nginx_modsec.sh"
-    PARM2="${TEMP_DIR}"
-    PARM1="${OWASP_DIR}"
+    PARM1="${TEMP_DIR}"
+    PARM2="${OWASP_DIR}"
     $PGM $PARM1 $PARM2
     if [ $? -gt 0 ] ; then
         fail_exit "install Nginx failed"
@@ -226,8 +226,8 @@ config_lswsModSec(){
         return 0
     fi
     PGM="${SCRIPTPATH}/config_lsws_modsec.sh"
-    PARM2="${TEMP_DIR}"
-    PARM1="${OWASP_DIR}"
+    PARM1="${TEMP_DIR}"
+    PARM2="${OWASP_DIR}"
     $PGM $PARM1 $PARM2 $LSDIR
     if [ $? -gt 0 ] ; then
         fail_exit "config lsws failed"
