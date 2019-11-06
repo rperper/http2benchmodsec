@@ -49,7 +49,7 @@ unconfig_nginxModSec(){
         echoG "Nginx already unconfigured for modsecurity"
         return 0
     fi
-    nginx -s stop
+    #nginx -s stop
     cp -f $NGDIR/nginx.conf.nomodsec $NGDIR/nginx.conf 
     cp -f $NGDIR/conf.d/default.conf.nomodsec $NGDIR/conf.d/default.conf 
     cp -f $NGDIR/conf.d/wordpress.conf.nomodsec $NGDIR/conf.d/wordpress.conf 

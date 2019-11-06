@@ -49,7 +49,7 @@ unconfig_lswsModSec(){
         echoG "LSWS already unconfigured for modsecurity"
         return 0
     fi
-    $LSDIR/bin/lswsctrl stop
+    #$LSDIR/bin/lswsctrl stop
     cp -f $LSDIR/conf/httpd_config.xml.nomodsec $LSDIR/conf/httpd_config.xml
 }
 
