@@ -111,6 +111,7 @@ install_modsecurity(){
         echoG "[OK] ModSecurity already installed"
         return 0
     fi
+    PWD=$(pwd)
     pushd temp
     install_pcre
     install_zlib
@@ -136,6 +137,7 @@ install_modsecurity(){
         fail_exit_fatal "[ERROR] Install of ModSecurity failed" 1
     fi
     popd +1
+    cd $PWD
 }
 
 install_nginxModSec(){
