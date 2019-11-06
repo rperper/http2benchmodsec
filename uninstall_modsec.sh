@@ -153,9 +153,9 @@ validate_servers(){
     if [ ! -f $SERVERACCESS -o ! -d $NGDIR -o ! -d $LSDIR ] ; then
         fail_exit_fatal 'Successfully install http2benchmark before installing ModSecurity for it'
     fi
-    if [ ! -d $TEMP_DIR -o ! -d $OWASP_DIR ] ; then
-        fail_exit_fatal 'Run modsec.sh before running uninstall'
-    fi
+    #if [ ! -d $TEMP_DIR -o ! -d $OWASP_DIR ] ; then
+    #    fail_exit_fatal 'Run modsec.sh before running uninstall'
+    #fi
 }
 
 validate_user(){
