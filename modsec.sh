@@ -177,7 +177,7 @@ install_owasp(){
         return 0
     fi
     if [ ! -x "${SCRIPTPATH}/install_owasp.sh" ] ; then
-        fail_exit "[ERROR] Missing ${SCRIPTPATH}/install_owasp.sh script"
+        fail_exit_fatal "[ERROR] Missing ${SCRIPTPATH}/install_owasp.sh script"
     fi
     PGM="${SCRIPTPATH}/install_owasp.sh"
     PARM1="${OWASP_DIR}"
@@ -193,7 +193,7 @@ install_nginxModSec(){
         return 0
     fi
     if [ ! -x "${SCRIPTPATH}/install_nginx_modsec.sh" ] ; then
-        fail_exit "[ERROR] Missing ${SCRIPTPATH}/install_owasp.sh script"
+        fail_exit_fatal "[ERROR] Missing ${SCRIPTPATH}/install_nginx_modsec.sh script"
     fi
     PGM="${SCRIPTPATH}/install_nginx_modsec.sh"
     PARM2="${TEMP_DIR}"
