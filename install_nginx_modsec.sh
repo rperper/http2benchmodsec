@@ -179,20 +179,6 @@ install_nginxModSec(){
     popd +1
 }
 
-config_nginxModSec(){
-    grep ngx_http_modsecurity_module.so $NGDIR/nginx.conf
-    if [ $? -eq 0 ] ; then
-        echoG "Nginx already configured for modsecurity"
-        return 0
-    fi
-    cp -f $NGDIR/nginx.conf $NGDIR/nginx.conf.nomodsec
-    cp -f $NGDIR/conf.d/default.conf $NGDIR/conf.d/default.conf.nomodsec
-    cp -f $NGDIR/conf.d/wordpress.conf $NGDIR/conf.d/wordpress.conf.nomodsec
-    sed -i '1iload_module modules/ngx_http_modsecurity_module.so;' $NGDIR/nginx.conf
-    sed -i "s=server {=server {\n    modsecurity on;\n    modsecurity_rules_file $OWASP_DIR/modsec_includes.conf;=g" $NGDIR/conf.d/default.conf
-    sed -i "s=server {=server {\n    modsecurity on;\n    modsecurity_rules_file $OWASP_DIR/modsec_includes.conf;=g" $NGDIR/conf.d/wordpress.conf
-}
-
 main(){
     install_modsecurity
     install_nginxModSec

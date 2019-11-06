@@ -211,8 +211,8 @@ config_nginxModSec(){
         return 0
     fi
     PGM="${SCRIPTPATH}/config_nginx_modsec.sh"
-    PARM2="${TEMP_DIR}"
-    PARM1="${OWASP_DIR}"
+    PARM1="${TEMP_DIR}"
+    PARM2="${OWASP_DIR}"
     $PGM $PARM1 $PARM2 $NGDIR
     if [ $? -gt 0 ] ; then
         fail_exit "config Nginx failed"
