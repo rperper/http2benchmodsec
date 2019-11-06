@@ -33,6 +33,7 @@ if [ $# -ne 2 ] ; then
 fi
 TEMP_DIR="${1}"
 OWASP_DIR="${2}"
+NGDIR='/etc/nginx'
 
 install_pcre(){
     if [ -d pcre-8.43 ] ; then
@@ -111,7 +112,6 @@ install_modsecurity(){
         echoG "[OK] ModSecurity already installed"
         return 0
     fi
-    PWD=$(pwd)
     pushd temp
     install_pcre
     install_zlib
@@ -136,18 +136,25 @@ install_modsecurity(){
     if [ $? -gt 0 ] ; then
         fail_exit_fatal "[ERROR] Install of ModSecurity failed" 1
     fi
+    echo "End of ModSecurity PWD: $(pwd)"
+    read line
     popd +1
-    cd $PWD
 }
 
 install_nginxModSec(){
+    echo "Start of nginxModSec PWD: $(pwd)"
+    read line
     pushd temp
     install_pcre
     install_zlib
     install_openssl
+    echo "Finished test of pre-reqs for nginxModSec PWD: $(pwd)"
+    read line
     git clone https://github.com/nginx/nginx.git
     git clone --depth 1 https://github.com/SpiderLabs/ModSecurity-nginx.git
     pushd nginx
+    echo "Did clones and in nginx dir for nginxModSec PWD: $(pwd)"
+    read line
     git checkout default
     auto/configure --with-compat --add-dynamic-module=../ModSecurity-nginx --prefix=$NGDIR --sbin-path=/usr/sbin/nginx --with-http_ssl_module --with-http_v2_module --conf-path=$NGDIR/nginx.conf --pid-path=/run/nginx.pid --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --with-pcre=../pcre-8.43 --with-zlib=../zlib-1.2.11 --with-http_ssl_module --with-stream --with-mail=dynamic 
     if [ $? -gt 0 ] ; then
