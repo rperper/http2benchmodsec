@@ -57,4 +57,4 @@ config_nginxModSec(){
     sed -i "s=server {=server {\n    modsecurity on;\n    modsecurity_rules_file $OWASP_DIR/modsec_includes.conf;=g" $NGDIR/conf.d/wordpress.conf
 }
 
-config_nginx_modsec
+config_nginxModSec

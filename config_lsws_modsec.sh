@@ -54,4 +54,4 @@ config_lswsModSec(){
     sed -i "s=</censorshipControl>=</censorshipControl>\n    <censorshipRuleSet>\n      <name>ModSec</name>\n      <enabled>1</enabled>\n      <ruleSet>include $OWASP_DIR/modsec_includes.conf</ruleSet>\n    </censorshipRuleSet>" $LSDIR/conf/httpd_config.xml
 }
 
-config_lsws_modsec
+config_lswsModSec
