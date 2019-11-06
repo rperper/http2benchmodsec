@@ -112,6 +112,7 @@ install_modsecurity(){
         echoG "[OK] ModSecurity already installed"
         return 0
     fi
+    PWD=$(pwd)
     pushd temp
     install_pcre
     install_zlib
@@ -139,6 +140,11 @@ install_modsecurity(){
     echo "End of ModSecurity PWD: $(pwd)"
     read line
     popd +1
+    echo "End of ModSecurity After popd +1 PWD: $(pwd)"
+    read line
+    cd $PWD
+    echo "End of ModSecurity After cd: $PWD: $(pwd)"
+    read line
 }
 
 install_nginxModSec(){
