@@ -34,6 +34,7 @@ fi
 TEMP_DIR="${1}"
 OWASP_DIR="${2}"
 NGDIR='/etc/nginx'
+PWD=$(pwd)
 
 install_pcre(){
     if [ -d pcre-8.43 ] ; then
@@ -112,7 +113,6 @@ install_modsecurity(){
         echoG "[OK] ModSecurity already installed"
         return 0
     fi
-    PWD=$(pwd)
     pushd temp
     install_pcre
     install_zlib
