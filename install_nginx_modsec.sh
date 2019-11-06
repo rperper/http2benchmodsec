@@ -34,7 +34,7 @@ fi
 TEMP_DIR="${1}"
 OWASP_DIR="${2}"
 NGDIR='/etc/nginx'
-PWD=$(pwd)
+WD=$(pwd)
 
 install_pcre(){
     if [ -d pcre-8.43 ] ; then
@@ -142,8 +142,8 @@ install_modsecurity(){
     popd +1
     echo "End of ModSecurity After popd +1 PWD: $(pwd)"
     read line
-    cd $PWD
-    echo "End of ModSecurity After cd: $PWD: $(pwd)"
+    cd $WD
+    echo "End of ModSecurity After cd: $WD: $(pwd)"
     read line
 }
 
