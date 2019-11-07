@@ -50,7 +50,7 @@ unconfig_olsModSec(){
         return 0
     fi
     #$OLSDIR/bin/lswsctrl stop
-    cp -f $OLSDIR/conf/httpd_config.conf.nomodsec $LSDIR/conf/httpd_config.conf
+    cp -f $OLSDIR/conf/httpd_config.conf.nomodsec $OLSDIR/conf/httpd_config.conf
 }
 
 unconfig_olsModSec
