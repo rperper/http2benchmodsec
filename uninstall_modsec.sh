@@ -237,9 +237,25 @@ unconfig_lswsModSec(){
     fi
 }
 
+unconfig_olsModSec(){
+    grep 'module mod_security {' $OLSDIR/conf/httpd_config.conf
+    if [ $? -eq 0 ] ; then
+        echoG "OpenLitespeed already unconfigured for modsecurity"
+        return 0
+    fi
+    PGM="${SCRIPTPATH}/unconfig_ols_modsec.sh"
+    PARM2="${TEMP_DIR}"
+    PARM1="${OWASP_DIR}"
+    $PGM $PARM1 $PARM2 $OLSDIR
+    if [ $? -gt 0 ] ; then
+        fail_exit "unconfig OpenLitespeed failed"
+    fi
+}
+
 main(){
     validate_servers
     validate_user
+    unconfig_olsModSec
     unconfig_lswsModSec
     unconfig_nginxModSec
     rm -rf $TEMP_DIR

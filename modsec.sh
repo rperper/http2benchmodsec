@@ -151,7 +151,7 @@ change_owner(){
 
 validate_servers(){
     if [ ! -f $SERVERACCESS -o ! -d $NGDIR -o ! -d $OLSDIR -o ! -d $LSDIR ] ; then
-        fail_exit 'Successfully install http2benchmark before installing ModSecurity for it'
+        fail_exit 'Successfully install http2benchmark (for OpenLitespeed, Enterprise Litespeed and Nginx) before installing ModSecurity for it'
     fi
 }
 
@@ -234,6 +234,21 @@ config_lswsModSec(){
     fi
 }
 
+config_olsModSec(){
+    grep 'module mod_security {' $OLSDIR/conf/httpd_config.conf
+    if [ $? -eq 0 ] ; then
+        echoG "OpenLitespeed already configured for modsecurity"
+        return 0
+    fi
+    PGM="${SCRIPTPATH}/config_ols_modsec.sh"
+    PARM1="${TEMP_DIR}"
+    PARM2="${OWASP_DIR}"
+    $PGM $PARM1 $PARM2 $OLSDIR
+    if [ $? -gt 0 ] ; then
+        fail_exit "config OpenLitespeed failed"
+    fi
+}
+
 main(){
     validate_servers
     validate_user
@@ -242,5 +257,6 @@ main(){
     install_nginxModSec
     config_nginxModSec
     config_lswsModSec
+    config_olsModSec
 }
 main
