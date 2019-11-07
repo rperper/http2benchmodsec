@@ -50,7 +50,7 @@ config_olsModSec(){
         return 0
     fi
     cp -f $OLSDIR/conf/httpd_config.conf $OLSDIR/conf/httpd_config.conf.nomodsec
-    sed -i "s=virtualhost=module mod_security {\nmodsecurity  off\nmodsecurity_rules \`\nSecRuleEngine On\n\`\nmodsecurity_rules_file $OWASP_DIR/modsec_includes.conf\n  ls_enabled              1\n}\n\nvirtualhost=" $OLSDIR/conf/httpd_config.conf
+    sed -i "s=virtualhost=module mod_security {\nmodsecurity  on\nmodsecurity_rules \`\nSecRuleEngine On\n\`\nmodsecurity_rules_file $OWASP_DIR/modsec_includes.conf\n  ls_enabled              1\n}\n\nvirtualhost=" $OLSDIR/conf/httpd_config.conf
 }
 
 config_olsModSec
