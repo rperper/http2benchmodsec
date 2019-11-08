@@ -114,14 +114,14 @@ check_server(){
 
 check_comodo(){
     if [ ${1} = 'lsws' -o ${1} = 'apache' ] ; then
-        DIR='comodo_apache'
+        COMODO_DIR='comodo_apache'
     else
-        DIR='comodo_nginx'
+        COMODO_DIR='comodo_nginx'
     fi
-    if [ ! -d "$DIR" ] ; then
-        fail_exit_fatal "You must install your rules in the $DIR directory"
+    if [ ! -d "$COMODO_DIR" ] ; then
+        fail_exit_fatal "You must install your rules in the $COMODO_DIR directory"
     fi
-    if [ ! -f "$DIR/rules.conf.main" ] ; then
+    if [ ! -f "$COMODO_DIR/rules.conf.main" ] ; then
         fail_exit_fatal "You must have the rules.conf.main in this directory"
     fi
 }
@@ -157,7 +157,7 @@ case "$1" in
             if [ $? -eq 0 ] ; then
                 PGM="${SCRIPTPATH}/$SCRIPT"
                 PARM1="${TEMP_DIR}"
-                PARM2="${OWASP_DIR}"
+                PARM2="${SCRIPTPATH}/${COMODO_DIR}"
                 $PGM $PARM1 $PARM2 $SERVER_DIR 1
                 if [ $? -gt 0 ] ; then
                     fail_exit "comodo config $SERVER failed"

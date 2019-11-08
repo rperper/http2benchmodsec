@@ -49,7 +49,7 @@ else
 fi
 
 config_nginxModSec(){
-    grep ngx_http_modsecurity_module.so $NGDIR/nginx.conf
+    silent grep ngx_http_modsecurity_module.so $NGDIR/nginx.conf
     if [ $? -eq 0 ] ; then
         echoG "Nginx already configured for modsecurity"
         return 0

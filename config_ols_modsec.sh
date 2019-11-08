@@ -49,7 +49,7 @@ else
 fi
 
 config_olsModSec(){
-    grep 'module mod_security {' $OLSDIR/conf/httpd_config.conf
+    silent grep 'module mod_security {' $OLSDIR/conf/httpd_config.conf
     if [ $? -eq 0 ] ; then
         echoG "OpenLitespeed already configured for modsecurity"
         return 0
