@@ -44,9 +44,9 @@ OWASP_DIR="${2}"
 APADIR="${3}"
 
 unconfig_apacheModSec(){
-    grep ngx_http_modsecurity_module.so $NGDIR/nginx.conf
+    silent grep "$OWASP_DIR" $APADIR/conf.d/mod_security.conf
     if [ $? -ne 0 ] ; then
-        echoG "Nginx already unconfigured for modsecurity"
+        echoG "Apache already unconfigured for modsecurity"
         return 0
     fi
     cp -f $APADIR/conf.d/mod_security.conf.nomodsec $APADIR/conf.d/mod_security.conf

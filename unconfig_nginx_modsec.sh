@@ -44,7 +44,7 @@ OWASP_DIR="${2}"
 NGDIR="${3}"
 
 unconfig_nginxModSec(){
-    grep ngx_http_modsecurity_module.so $NGDIR/nginx.conf
+    silent grep ngx_http_modsecurity_module.so $NGDIR/nginx.conf
     if [ $? -ne 0 ] ; then
         echoG "Nginx already unconfigured for modsecurity"
         return 0
