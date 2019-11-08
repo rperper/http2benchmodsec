@@ -58,9 +58,9 @@ config_apacheModSec(){
         cp -f $APADIR/conf.d/mod_security.conf $APADIR/conf.d/mod_security.conf.nomodsec
     fi
     if [ $COMODO -eq 1 ] ; then
-        echo -e "<IfModule mod_security2.c>\n    # http2Benchmark Comodo Rules\n        SecDataDir $OWASP_DIR\n    Include $OWASP_DIR/rules.conf.main\n</IfModule>\n" > $APADIR/conf.d/mod_security.conf
+        echo -e "<IfModule mod_security2.c>\n    # http2Benchmark Comodo Rules\n    SecDataDir $OWASP_DIR\n    Include $OWASP_DIR/*.conf\n</IfModule>\n" > $APADIR/conf.d/mod_security.conf
     else
-        echo -e "<IfModule mod_security2.c>\n    # http2Benchmark OWASP Rules\n        SecDataDir $OWASP_DIR/owasp-modsecurity-crs/rules\n    #Include $OWASP_DIR/modsec_includes.conf\n    Include $OWASP_DIR/modsecurity.conf\n    Include $OWASP_DIR/owasp-modsecurity-crs/crs-setup.conf\n    Include $OWASP_DIR/owasp-modsecurity-crs/rules/*.conf\n</IfModule>\n" > $APADIR/conf.d/mod_security.conf
+        echo -e "<IfModule mod_security2.c>\n    # http2Benchmark OWASP Rules\n    SecDataDir $OWASP_DIR/owasp-modsecurity-crs/rules\n    #Include $OWASP_DIR/modsec_includes.conf\n    Include $OWASP_DIR/modsecurity.conf\n    Include $OWASP_DIR/owasp-modsecurity-crs/crs-setup.conf\n    Include $OWASP_DIR/owasp-modsecurity-crs/rules/*.conf\n</IfModule>\n" > $APADIR/conf.d/mod_security.conf
     fi
 }
 
