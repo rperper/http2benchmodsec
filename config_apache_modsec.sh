@@ -49,7 +49,7 @@ else
 fi
 
 config_apacheModSec(){
-    silent grep "$OWASP_DIR" $APADIR/conf.d/mod_security.conf
+    silent grep "http2Benchmark" $APADIR/conf.d/mod_security.conf
     if [ $? -eq 0 ] ; then
         echoG "Apache already configured for modsecurity"
         return 0

@@ -44,7 +44,7 @@ OWASP_DIR="${2}"
 APADIR="${3}"
 
 unconfig_apacheModSec(){
-    silent grep "$OWASP_DIR" $APADIR/conf.d/mod_security.conf
+    silent grep "http2Benchmark" $APADIR/conf.d/mod_security.conf
     if [ $? -ne 0 ] ; then
         echoG "Apache already unconfigured for modsecurity"
         return 0
