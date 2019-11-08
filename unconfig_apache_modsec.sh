@@ -49,7 +49,11 @@ unconfig_apacheModSec(){
         echoG "Apache already unconfigured for modsecurity"
         return 0
     fi
-    cp -f $APADIR/conf.d/mod_security.conf.nomodsec $APADIR/conf.d/mod_security.conf
+    if [ -f $APADIR/conf.d/mod_security.conf.nomodsec ] ; then
+        cp -f $APADIR/conf.d/mod_security.conf.nomodsec $APADIR/conf.d/mod_security.conf
+    else
+        rm $APADIR/conf.d/mod_security.conf
+    fi
 }
 
 unconfig_apacheModSec
