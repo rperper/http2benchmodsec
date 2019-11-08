@@ -9,7 +9,7 @@ CUSTOM_WP="${ENVFD}/custom_wp"
 SERVERACCESS="${ENVFD}/serveraccess.txt"
 DOCROOT='/var/www/html'
 NGDIR='/etc/nginx'
-#APADIR='/etc/apache2'
+APADIR='/etc/apache2'
 LSDIR='/usr/local/entlsws'
 OLSDIR='/usr/local/lsws'
 #CADDIR='/etc/caddy'
@@ -187,6 +187,14 @@ install_owasp(){
     fi
 }
 
+install_apacheModSec(){
+    PGM="${SCRIPTPATH}/install_apache_modsec.sh"
+    $PGM $APADIR $OSNAME
+    if [ $? -gt 0 ] ; then
+        fail_exit "install Apache failed"
+    fi
+}
+
 install_nginxModSec(){
     if [ -f $NGDIR/modules/ngx_http_modsecurity_module.so ] ; then
         echoG 'Nginx modsecurity module already compiled and installed'
@@ -204,8 +212,23 @@ install_nginxModSec(){
     fi
 }
 
+config_apacheModSec(){
+    silent grep "$OWASP_DIR" $APADIR/conf.d/mod_security.conf
+    if [ $? -eq 0 ] ; then
+        echoG "Apache already configured for modsecurity"
+        return 0
+    fi
+    PGM="${SCRIPTPATH}/config_apache_modsec.sh"
+    PARM1="${TEMP_DIR}"
+    PARM2="${OWASP_DIR}"
+    $PGM $PARM1 $PARM2 $APADIR
+    if [ $? -gt 0 ] ; then
+        fail_exit "config Apache failed"
+    fi
+}
+
 config_nginxModSec(){
-    grep ngx_http_modsecurity_module.so $NGDIR/nginx.conf
+    silent grep ngx_http_modsecurity_module.so $NGDIR/nginx.conf
     if [ $? -eq 0 ] ; then
         echoG "Nginx already configured for modsecurity"
         return 0
@@ -220,7 +243,7 @@ config_nginxModSec(){
 }
 
 config_lswsModSec(){
-    grep '<enableCensorship>1</enableCensorship>' $LSDIR/conf/httpd_config.xml
+    silent grep '<enableCensorship>1</enableCensorship>' $LSDIR/conf/httpd_config.xml
     if [ $? -eq 0 ] ; then
         echoG "LSWS already configured for modsecurity"
         return 0
@@ -235,7 +258,7 @@ config_lswsModSec(){
 }
 
 config_olsModSec(){
-    grep 'module mod_security {' $OLSDIR/conf/httpd_config.conf
+    silent grep 'module mod_security {' $OLSDIR/conf/httpd_config.conf
     if [ $? -eq 0 ] ; then
         echoG "OpenLitespeed already configured for modsecurity"
         return 0
@@ -254,7 +277,9 @@ main(){
     validate_user
     install_prereq
     install_owasp
+    install_apacheModSec
     install_nginxModSec
+    config_apacheModSec
     config_nginxModSec
     config_lswsModSec
     config_olsModSec

@@ -9,7 +9,7 @@ CUSTOM_WP="${ENVFD}/custom_wp"
 SERVERACCESS="${ENVFD}/serveraccess.txt"
 DOCROOT='/var/www/html'
 NGDIR='/etc/nginx'
-#APADIR='/etc/apache2'
+APADIR='/etc/apache2'
 LSDIR='/usr/local/entlsws'
 OLSDIR='/usr/local/lsws'
 #CADDIR='/etc/caddy'
@@ -207,8 +207,23 @@ install_nginxModSec(){
     fi
 }
 
+unconfig_apacheModSec(){
+    silent grep "$OWASP_DIR" $APADIR/conf.d/mod_security.conf
+    if [ $? -ne 0 ] ; then
+        echoG "Apache already unconfigured for modsecurity"
+        return 0
+    fi
+    PGM="${SCRIPTPATH}/unconfig_apache_modsec.sh"
+    PARM1="${TEMP_DIR}"
+    PARM2="${OWASP_DIR}"
+    $PGM $PARM1 $PARM2 $APADIR
+    if [ $? -gt 0 ] ; then
+        fail_exit "unconfig Apache failed"
+    fi
+}
+
 unconfig_nginxModSec(){
-    grep ngx_http_modsecurity_module.so $NGDIR/nginx.conf
+    silent grep ngx_http_modsecurity_module.so $NGDIR/nginx.conf
     if [ $? -ne 0 ] ; then
         echoG "Nginx already unconfigured for modsecurity"
         return 0
@@ -223,7 +238,7 @@ unconfig_nginxModSec(){
 }
 
 unconfig_lswsModSec(){
-    grep '<enableCensorship>0</enableCensorship>' $LSDIR/conf/httpd_config.xml
+    silent grep '<enableCensorship>0</enableCensorship>' $LSDIR/conf/httpd_config.xml
     if [ $? -eq 0 ] ; then
         echoG "LSWS already unconfigured for modsecurity"
         return 0
@@ -238,7 +253,7 @@ unconfig_lswsModSec(){
 }
 
 unconfig_olsModSec(){
-    grep 'module mod_security {' $OLSDIR/conf/httpd_config.conf
+    silent grep 'module mod_security {' $OLSDIR/conf/httpd_config.conf
     if [ $? -ne 0 ] ; then
         echoG "OpenLitespeed already unconfigured for modsecurity"
         return 0
@@ -258,6 +273,7 @@ main(){
     unconfig_olsModSec
     unconfig_lswsModSec
     unconfig_nginxModSec
+    unconfig_apacheModSec
     rm -rf $TEMP_DIR
     #uninstall_nginxModSec
     #uninstall_owasp
