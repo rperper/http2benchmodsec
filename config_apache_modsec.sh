@@ -35,13 +35,18 @@ fail_exit_fatal(){
     exit 1
 }
 
-if [ $# -ne 3 ] ; then
+if [ $# -lt 3 ] ; then
     fail_exit "Needs to be run by modsec.sh"
     exit 1
 fi
 TEMP_DIR="${1}"
 OWASP_DIR="${2}"
 APADIR="${3}"
+if [ $# -eq 4 ] ; then
+    COMODO=1
+else
+    COMODO=0
+fi
 
 config_apacheModSec(){
     silent grep "$OWASP_DIR" $APADIR/conf.d/mod_security.conf
@@ -52,7 +57,11 @@ config_apacheModSec(){
     if [ -f $APADIR/conf.d/mod_security.conf ] ; then
         cp -f $APADIR/conf.d/mod_security.conf $APADIR/conf.d/mod_security.conf.nomodsec
     fi
-    echo -e "<IfModule mod_security2.c>\n    # http2Benchmark OWASP Rules\n        SecDataDir $OWASP_DIR/owasp-modsecurity-crs/rules\n    #Include $OWASP_DIR/modsec_includes.conf\n    Include $OWASP_DIR/modsecurity.conf\n    Include $OWASP_DIR/owasp-modsecurity-crs/crs-setup.conf\n    Include $OWASP_DIR/owasp-modsecurity-crs/rules/*.conf\n</IfModule>\n" > $APADIR/conf.d/mod_security.conf
+    if [ $COMODO -eq 1 ] ; then
+        echo -e "<IfModule mod_security2.c>\n    # http2Benchmark Comodo Rules\n        SecDataDir $OWASP_DIR\n    Include $OWASP_DIR/rules.conf.main\n</IfModule>\n" > $APADIR/conf.d/mod_security.conf
+    else
+        echo -e "<IfModule mod_security2.c>\n    # http2Benchmark OWASP Rules\n        SecDataDir $OWASP_DIR/owasp-modsecurity-crs/rules\n    #Include $OWASP_DIR/modsec_includes.conf\n    Include $OWASP_DIR/modsecurity.conf\n    Include $OWASP_DIR/owasp-modsecurity-crs/crs-setup.conf\n    Include $OWASP_DIR/owasp-modsecurity-crs/rules/*.conf\n</IfModule>\n" > $APADIR/conf.d/mod_security.conf
+    fi
 }
 
 config_apacheModSec

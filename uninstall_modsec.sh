@@ -23,7 +23,7 @@ GROUP='www-data'
 #PHP_S='2'
 REPOPATH=''
 SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
-SERVER_LIST="lsws nginx openlitespeed"
+SERVER_LIST="lsws nginx openlitespeed apache"
 #DOMAIN_NAME='benchmark.com'
 #WP_DOMAIN_NAME='wordpress.benchmark.com'
 declare -A WEB_ARR=( [lsws]=wp_lsws [nginx]=wp_nginx [openlitespeed]=wp_openlitespeed )

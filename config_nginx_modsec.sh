@@ -35,13 +35,18 @@ fail_exit_fatal(){
     exit 1
 }
 
-if [ $# -ne 3 ] ; then
+if [ $# -lt 3 ] ; then
     fail_exit "Needs to be run by modsec.sh"
     exit 1
 fi
 TEMP_DIR="${1}"
 OWASP_DIR="${2}"
 NGDIR="${3}"
+if [ $# -eq 4 ] ; then
+    COMODO=1
+else
+    COMODO=0
+fi
 
 config_nginxModSec(){
     grep ngx_http_modsecurity_module.so $NGDIR/nginx.conf
@@ -53,8 +58,13 @@ config_nginxModSec(){
     cp -f $NGDIR/conf.d/default.conf $NGDIR/conf.d/default.conf.nomodsec
     cp -f $NGDIR/conf.d/wordpress.conf $NGDIR/conf.d/wordpress.conf.nomodsec
     sed -i '1iload_module modules/ngx_http_modsecurity_module.so;' $NGDIR/nginx.conf
-    sed -i "s=server {=server {\n    modsecurity on;\n    modsecurity_rules_file $OWASP_DIR/modsec_includes.conf;=g" $NGDIR/conf.d/default.conf
-    sed -i "s=server {=server {\n    modsecurity on;\n    modsecurity_rules_file $OWASP_DIR/modsec_includes.conf;=g" $NGDIR/conf.d/wordpress.conf
+    if [ $COMODO -eq 1 ] ; then
+        sed -i "s=server {=server {\n    modsecurity on;\n    modsecurity_rules_file $OWASP_DIR/rules.conf.main;=g" $NGDIR/conf.d/default.conf
+        sed -i "s=server {=server {\n    modsecurity on;\n    modsecurity_rules_file $OWASP_DIR/rules.conf.main;=g" $NGDIR/conf.d/wordpress.conf
+    else
+        sed -i "s=server {=server {\n    modsecurity on;\n    modsecurity_rules_file $OWASP_DIR/modsec_includes.conf;=g" $NGDIR/conf.d/default.conf
+        sed -i "s=server {=server {\n    modsecurity on;\n    modsecurity_rules_file $OWASP_DIR/modsec_includes.conf;=g" $NGDIR/conf.d/wordpress.conf
+    fi
 }
 
 config_nginxModSec

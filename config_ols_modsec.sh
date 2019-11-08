@@ -35,13 +35,18 @@ fail_exit_fatal(){
     exit 1
 }
 
-if [ $# -ne 3 ] ; then
+if [ $# -lt 3 ] ; then
     fail_exit "Needs to be run by modsec.sh"
     exit 1
 fi
 TEMP_DIR="${1}"
 OWASP_DIR="${2}"
 OLSDIR="${3}"
+if [ $# -eq 4 ] ; then
+    COMODO=1
+else
+    COMODO=0
+fi
 
 config_olsModSec(){
     grep 'module mod_security {' $OLSDIR/conf/httpd_config.conf
@@ -50,7 +55,12 @@ config_olsModSec(){
         return 0
     fi
     cp -f $OLSDIR/conf/httpd_config.conf $OLSDIR/conf/httpd_config.conf.nomodsec
-    sed -i "s=module cache=module mod_security {\nmodsecurity  on\nmodsecurity_rules \`\nSecRuleEngine On\n\`\nmodsecurity_rules_file $OWASP_DIR/modsec_includes.conf\n  ls_enabled              1\n}\n\nmodule cache=" $OLSDIR/conf/httpd_config.conf
+    if [ $COMODO -eq 1 ] ; then
+        RULES_FILE='rules.conf.main'
+    else
+        RULES_FILE='modsec_includes.conf'
+    fi
+    sed -i "s=module cache=module mod_security {\nmodsecurity  on\nmodsecurity_rules \`\nSecRuleEngine On\n\`\nmodsecurity_rules_file $OWASP_DIR/$RULES_FILE\n  ls_enabled              1\n}\n\nmodule cache=" $OLSDIR/conf/httpd_config.conf
 }
 
 config_olsModSec
