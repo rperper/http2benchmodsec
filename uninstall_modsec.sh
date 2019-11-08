@@ -278,5 +278,6 @@ main(){
     #uninstall_nginxModSec
     #uninstall_owasp
     #uninstall_prereq
+    echoG "Uninstall complete and successful"
 }
 main

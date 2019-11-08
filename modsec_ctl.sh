@@ -91,7 +91,7 @@ if [ ! -f $SERVERACCESS -o ! -d $NGDIR -o ! -d $LSDIR ] ; then
     fail_exit_fatal 'Successfully install http2benchmark before installing ModSecurity for it'
 fi
 if [ ! -d $TEMP_DIR -o ! -d $OWASP_DIR ] ; then
-    fail_exit_fatal 'Run modsec.sh before running uninstall'
+    fail_exit_fatal 'Run modsec.sh before running modsec_ctl'
 fi
 
 check_server(){
@@ -128,6 +128,7 @@ check_comodo(){
 
 case "$1" in
     config)
+        FAILED=0
         for SERVER in ${SERVER_LIST}; do
             check_server $SERVER
             if [ $? -eq 0 ] ; then
@@ -137,12 +138,19 @@ case "$1" in
                 $PGM $PARM1 $PARM2 $SERVER_DIR
                 if [ $? -gt 0 ] ; then
                     fail_exit "config $SERVER failed"
+                    FAILED=1
                 fi
             fi
         done
+        if [ $FAILED -eq 1 ] ; then
+            echoY "config completed with some failures"
+        else
+            echoG "config completed successfully"
+        fi
         ;;
         
     comodo)
+        FAILED=0
         for SERVER in ${SERVER_LIST}; do
             check_server $SERVER
             check_comodo $SERVER
@@ -153,12 +161,19 @@ case "$1" in
                 $PGM $PARM1 $PARM2 $SERVER_DIR 1
                 if [ $? -gt 0 ] ; then
                     fail_exit "comodo config $SERVER failed"
+                    FAILED=1
                 fi
             fi
         done
+        if [ $FAILED -eq 1 ] ; then
+            echoY "comodo config completed with some failures"
+        else
+            echoG "comodo config completed successfully"
+        fi
         ;;
         
     unconfig)
+        FAILED=0
         for SERVER in ${SERVER_LIST}; do
             check_server $SERVER
             if [ $? -eq 0 ] ; then
@@ -168,9 +183,15 @@ case "$1" in
                 $PGM $PARM1 $PARM2 $SERVER_DIR
                 if [ $? -gt 0 ] ; then
                     fail_exit "config $SERVER failed"
+                    FAILED=1
                 fi
             fi
         done
+        if [ $FAILED -eq 1 ] ; then
+            echoY "unconfig completed with some failures"
+        else
+            echoG "unconfig completed successfully"
+        fi
         ;;
         
     *)

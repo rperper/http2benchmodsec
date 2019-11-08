@@ -283,5 +283,6 @@ main(){
     config_nginxModSec
     config_lswsModSec
     config_olsModSec
+    echoG "Installation complete and successful"
 }
 main

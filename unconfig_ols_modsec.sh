@@ -44,7 +44,7 @@ OWASP_DIR="${2}"
 OLSDIR="${3}"
 
 unconfig_olsModSec(){
-    grep 'module mod_security {' $OLSDIR/conf/httpd_config.conf
+    silent grep 'module mod_security {' $OLSDIR/conf/httpd_config.conf
     if [ $? -ne 0 ] ; then
         echoG "OpenLitespeed already unconfigured for modsecurity"
         return 0
