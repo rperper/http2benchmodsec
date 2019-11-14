@@ -96,7 +96,7 @@ check_system
 validate_command_line(){
     if [ $# -eq 1 ]; then
         for SERVER in ${SERVER_LIST}; do
-            if [ $SERVER = $1 ]; then
+            if [ $SERVER = $PARM1 ]; then
                 echoG "Server set to $SERVER"
                 return 0
             fi
@@ -109,6 +109,9 @@ validate_command_line(){
     echoG "Server set to $SERVER"
     return 0
 }
+if [ $# -eq 1 ]; then
+    PARM1=$1
+fi
 validate_command_line
 echoG "Server set to $SERVER"
 
