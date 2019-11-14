@@ -97,7 +97,6 @@ if [ $# -eq 1 ]; then
     FOUND=0
     for SERVER in ${SERVER_LIST}; do
         if [ "$SERVER" = "$1" ]; then
-            echoG "Server set to $SERVER"
             FOUND=1
             break;
         fi

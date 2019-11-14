@@ -35,7 +35,10 @@ fail_exit_fatal(){
     exit 1
 }
 
-if [ $# -ne 3 ] ; then
+if [ $# -eq 0 ]; then
+    ./modsec_ctl.sh unconfig lsws
+    exit $?
+elif [ $# -ne 3 ] ; then
     fail_exit "Needs to be run by uninstall_modsec.sh"
     exit 1
 fi
