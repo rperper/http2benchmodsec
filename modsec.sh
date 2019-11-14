@@ -95,7 +95,7 @@ check_system
 
 if [ $# -eq 1 ]; then
     for SERVER in ${SERVER_LIST}; do
-        if [ $SERVER = $PARM1 ]; then
+        if [ "$SERVER" = "$1" ]; then
             echoG "Server set to $SERVER"
             break;
         fi
