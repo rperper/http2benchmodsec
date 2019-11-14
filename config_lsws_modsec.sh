@@ -52,7 +52,7 @@ else
 fi
 
 config_lswsModSec(){
-    grep '<enableCensorship>1</enableCensorship>' $LSDIR/conf/httpd_config.xml
+    silent grep '<enableCensorship>1</enableCensorship>' $LSDIR/conf/httpd_config.xml
     if [ $? -eq 0 ] ; then
         echoG "LSWS already configured for modsecurity"
         return 0

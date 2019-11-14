@@ -44,7 +44,7 @@ OWASP_DIR="${2}"
 LSDIR="${3}"
 
 unconfig_lswsModSec(){
-    grep '<enableCensorship>0</enableCensorship>' $LSDIR/conf/httpd_config.xml
+    silent grep '<enableCensorship>0</enableCensorship>' $LSDIR/conf/httpd_config.xml
     if [ $? -eq 0 ] ; then
         echoG "LSWS already unconfigured for modsecurity"
         return 0

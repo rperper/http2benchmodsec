@@ -97,6 +97,7 @@ validate_command_line(){
     if [ $# -eq 1 ]; then
         for SERVER in ${SERVER_LIST}; do
             if [ $SERVER = $1 ]; then
+                echoG "Server set to $SERVER"
                 return 0
             fi
         done
@@ -105,9 +106,11 @@ validate_command_line(){
         fail_exit_fatal "Must be called with no parameters for all servers or a valid server"
     fi
     SERVER=$SERVERS_ALL
+    echoG "Server set to $SERVER"
     return 0
 }
 validate_command_line
+echoG "Server set to $SERVER"
 
 validate_servers(){
     if [ ! -f $SERVERACCESS ] ; then
