@@ -160,50 +160,7 @@ validate_servers(){
 
 validate_user(){
     if [ "$EUID" -ne 0 ] ; then
-        fail_exit 'You must run this script as root'
-    fi
-}
-
-uninstall_prereq(){
-    if [ ${OSNAME} = 'centos' ]; then
-        yum group install "Development Tools" -y
-        yum install geoip geoip-devel yajl lmdb -y
-    else
-        apt install build-essential
-        apt install libgeoip1 libgeoip-dev geoip-bin libyajl-dev lmdb-utils
-    fi    
-}
-
-install_owasp(){
-    if [ -d "$OWASP_DIR" ] ; then
-        echoG "[OK] OWASP already installed"
-        return 0
-    fi
-    if [ ! -x "${SCRIPTPATH}/install_owasp.sh" ] ; then
-        fail_exit "[ERROR] Missing ${SCRIPTPATH}/install_owasp.sh script"
-    fi
-    PGM="${SCRIPTPATH}/install_owasp.sh"
-    PARM1="${OWASP_DIR}"
-    $PGM $PARM1
-    if [ $? -gt 0 ] ; then
-        fail_exit "install_owasp failed"
-    fi
-}
-
-install_nginxModSec(){
-    if [ -f $NGDIR/modules/ngx_http_modsecurity_module.so ] ; then
-        echoG 'Nginx modsecurity module already compiled and installed'
-        return 0
-    fi
-    if [ ! -x "${SCRIPTPATH}/install_nginx_modsec.sh" ] ; then
-        fail_exit "[ERROR] Missing ${SCRIPTPATH}/install_owasp.sh script"
-    fi
-    PGM="${SCRIPTPATH}/install_nginx_modsec.sh"
-    PARM2="${TEMP_DIR}"
-    PARM1="${OWASP_DIR}"
-    $PGM $PARM1 $PARM2
-    if [ $? -gt 0 ] ; then
-        fail_exit "install Nginx failed"
+        fail_exit_fatal 'You must run this script as root'
     fi
 }
 

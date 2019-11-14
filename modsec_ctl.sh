@@ -2,7 +2,6 @@
 # /********************************************************************
 # HTTP2 Benchmark Modify Server for ModSecurity contro script.      
 # *********************************************************************/
-SERVER_LIST="lsws nginx openlitespeed apache"
 CMDFD='/opt'
 ENVFD="${CMDFD}/env"
 ENVLOG="${ENVFD}/server/environment.log"
@@ -14,6 +13,11 @@ APADIR='/etc/apache2'
 LSDIR='/usr/local/entlsws'
 OLSDIR='/usr/local/lsws'
 SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
+SERVER_APACHE='apache'
+SERVER_LSWS='lsws'
+SERVER_NGINX='nginx'
+SERVER_OLS='openlitespeed'
+SERVER_LIST="$SERVER_LSWS $SERVER_NGINX $SERVER_OLS $SERVER_APACHE"
 
 TEMP_DIR="${SCRIPTPATH}/temp"
 OWASP_DIR="${TEMP_DIR}/owasp"
@@ -85,6 +89,22 @@ check_system
 if [ $# -lt 1 ] ; then
     usage
     fail_exit_fatal "Needs to be run with a parameter"
+elif [ $# -eq 2 ] ; then
+    FOUND=0
+    for SERVER in ${SERVER_LIST}; do
+        if [ $2 = $SERVER ]; then
+            SERVER_LIST=$SERVER
+            FOUND=1
+            break
+        fi
+    done
+    if [ $FOUND -eq 0 ]; then
+        usage
+        fail_exit_fatal "You specified an unknown server to control on the command line"
+    fi
+elif [ $# -gt 2 ]; then
+    usage
+    fail_exit_fatal "You specified too many parameters on the command line"
 fi
 
 if [ ! -f $SERVERACCESS -o ! -d $NGDIR -o ! -d $LSDIR ] ; then

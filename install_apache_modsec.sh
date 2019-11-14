@@ -28,8 +28,11 @@ fail_exit(){
 }
 
 if [ $# -ne 2 ] ; then
-    fail_exit "Needs to be run by modsec.sh"
-    exit 1
+    if [ $# -eq 0 ]; then
+        ./modsec.sh "apache"
+        exit $?
+    fi
+    fail_exit_fatal "Needs to be run by modsec.sh"
 fi
 APADIR="${1}"
 OSNAME="${2}"

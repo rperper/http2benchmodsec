@@ -36,7 +36,11 @@ fail_exit_fatal(){
 }
 
 if [ $# -lt 3 ] ; then
-    fail_exit "Needs to be run by modsec.sh"
+    if [ $# -eq 0 ]; then
+        ./modsec.sh "apache"
+        exit $?
+    fi
+    fail_exit_fatal "Needs to be run by modsec.sh"
     exit 1
 fi
 TEMP_DIR="${1}"

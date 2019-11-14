@@ -23,7 +23,12 @@ GROUP='www-data'
 #PHP_S='2'
 REPOPATH=''
 SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
-SERVER_LIST="lsws nginx openlitespeed"
+SERVER_APACHE='apache'
+SERVER_LSWS='lsws'
+SERVER_NGINX='nginx'
+SERVER_OLS='openlitespeed'
+SERVER_LIST="$SERVER_LSWS $SERVER_NGINX $SERVER_OLS $SERVER_APACHE"
+SERVERS_ALL='all'
 #DOMAIN_NAME='benchmark.com'
 #WP_DOMAIN_NAME='wordpress.benchmark.com'
 declare -A WEB_ARR=( [lsws]=wp_lsws [nginx]=wp_nginx [openlitespeed]=wp_openlitespeed )
@@ -88,78 +93,48 @@ check_system(){
 }
 check_system
 
-KILL_PROCESS(){
-    PROC_NUM=$(pidof ${1})
-    if [ ${?} = 0 ]; then
-        kill -9 ${PROC_NUM}
-    fi    
-}
-
-backup_old(){
-    if [ -f ${1} ] && [ ! -f ${1}_old ]; then
-       mv ${1} ${1}_old
+validate_command_line(){
+    if [ $# -eq 1 ]; then
+        for SERVER in ${SERVER_LIST}; do
+            if [ $SERVER = $1 ]; then
+                return 0
+            fi
+        done
+        fail_exit_fatal "Must be called with no parameters for all servers or a valid server"
+    elif [ $# -gt 1 ]; then
+        fail_exit_fatal "Must be called with no parameters for all servers or a valid server"
     fi
+    SERVER=$SERVERS_ALL
+    return 0
 }
-
-checkweb(){
-    if [ ${1} = 'lsws' ] || [ ${1} = 'ols' ]; then
-        ps -ef | grep lshttpd | grep -v grep >/dev/null 2>&1
-    else
-        ps -ef | grep "${1}" | grep -v grep >/dev/null 2>&1
-    fi    
-    if [ ${?} = 0 ]; then 
-        echoG "${1} process is running!"
-        echoG 'Stop web service temporary'
-        if [ "${1}" = 'lsws' ]; then 
-           PROC_NAME='lshttpd'
-            silent ${LSDIR}/bin/lswsctrl stop
-            ps aux | grep '[w]swatch.sh' >/dev/null 2>&1
-            if [ ${?} = 0 ]; then
-                kill -9 $(ps aux | grep '[w]swatch.sh' | awk '{print $2}')
-            fi    
-        elif [ "${1}" = 'ols' ]; then 
-            PROC_NAME='lshttpd'
-            silent ${OLSDIR}/bin/lswsctrl stop  
-        elif [ "${1}" = 'nginx' ]; then 
-            PROC_NAME='nginx'
-            silent service ${PROC_NAME} stop
-        elif [ "${1}" = 'httpd' ]; then
-            PROC_NAME='httpd'
-            silent systemctl stop ${PROC_NAME}
-        elif [ "${1}" = 'apache2' ]; then
-            PROC_NAME='apache2' 
-            silent systemctl stop ${PROC_NAME}
-        elif [ "${1}" = 'h2o' ]; then
-            PROC_NAME='h2o' 
-            silent systemctl stop ${PROC_NAME}
-        fi
-        sleep 5
-        if [ $(systemctl is-active ${PROC_NAME}) != 'active' ]; then 
-            echoG "[OK] Stop ${PROC_NAME} service"
-        else 
-            echoR "[Failed] Stop ${PROC_NAME} service"
-        fi 
-    else 
-        echoR '[ERROR] Failed to start the web server.'
-        ps -ef | grep ${PROC_NAME} | grep -v grep
-    fi 
-}
-
-change_owner(){
-    chown -R ${USER}:${GROUP} ${1}
-}
+validate_command_line
 
 validate_servers(){
-    if [ ! -f $SERVERACCESS -o ! -d $NGDIR -o ! -d $OLSDIR -o ! -d $LSDIR ] ; then
-        fail_exit 'Successfully install http2benchmark (for OpenLitespeed, Enterprise Litespeed and Nginx) before installing ModSecurity for it'
+    if [ ! -f $SERVERACCESS ] ; then
+        fail_exit_fatal 'Successfully install http2benchmark before installing ModSecurity for it'
+    fi
+    if [ $SERVER = $SERVERS_ALL ]; then
+        if [ ! -d $APADIR -o ! -d $NGDIR -o ! -d $OLSDIR -o ! -d $LSDIR ] ; then
+            fail_exit_fatal 'Successfully install http2benchmark (for Apache, OpenLitespeed, Enterprise Litespeed and Nginx) before installing ModSecurity for it'
+        fi
+    elif [ $SERVER = $SERVER_APACHE -a ! -d $APADIR ]; then
+        fail_exit_fatal 'Successfully install http2benchmark for Apache before installing ModSecurity for it'
+    elif [ $SERVER = $SERVER_LSWS -a ! -d $LSDIR ]; then
+        fail_exit_fatal 'Successfully install http2benchmark for Litespeed Enterprise before installing ModSecurity for it'
+    elif [ $SERVER = $SERVER_NGINX -a ! -d $NGDIR ]; then
+        fail_exit_fatal 'Successfully install http2benchmark for Nginx before installing ModSecurity for it'
+    elif [ $SERVER = $SERVER_OLS -a ! -d $OLSDIR ]; then
+        fail_exit_fatal 'Successfully install http2benchmark for OpenLitespeed before installing ModSecurity for it'
     fi
 }
+validate_servers
 
 validate_user(){
     if [ "$EUID" -ne 0 ] ; then
         fail_exit 'You must run this script as root'
     fi
 }
+validate_user
 
 install_prereq(){
     if [ ${OSNAME} = 'centos' ]; then
@@ -273,16 +248,26 @@ config_olsModSec(){
 }
 
 main(){
-    validate_servers
-    validate_user
     install_prereq
     install_owasp
-    install_apacheModSec
-    install_nginxModSec
-    config_apacheModSec
-    config_nginxModSec
-    config_lswsModSec
-    config_olsModSec
+    if [ $SERVER = $SERVERS_ALL -o $SERVER = $SERVER_APACHE ]; then
+        install_apacheModSec
+    fi
+    if [ $SERVER = $SERVERS_ALL -o $SERVER = $SERVER_NGINX ]; then
+        install_nginxModSec
+    fi
+    if [ $SERVER = $SERVERS_ALL -o $SERVER = $SERVER_APACHE ]; then
+        config_apacheModSec
+    fi
+    if [ $SERVER = $SERVERS_ALL -o $SERVER = $SERVER_NGINX ]; then
+        config_nginxModSec
+    fi
+    if [ $SERVER = $SERVERS_ALL -o $SERVER = $SERVER_LSWS ]; then
+        config_lswsModSec
+    fi
+    if [ $SERVER = $SERVERS_ALL -o $SERVER = $SERVER_OLS ]; then
+        config_olsModSec
+    fi
     echoG "Installation complete and successful"
 }
 main

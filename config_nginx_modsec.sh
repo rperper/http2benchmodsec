@@ -36,8 +36,11 @@ fail_exit_fatal(){
 }
 
 if [ $# -lt 3 ] ; then
-    fail_exit "Needs to be run by modsec.sh"
-    exit 1
+    if [ $# -eq 0 ]; then
+        ./modsec.sh "nginx"
+        exit $?
+    fi
+    fail_exit_fatal "Needs to be run by modsec.sh"
 fi
 TEMP_DIR="${1}"
 OWASP_DIR="${2}"
