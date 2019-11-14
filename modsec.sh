@@ -93,26 +93,19 @@ check_system(){
 }
 check_system
 
-validate_command_line(){
-    if [ $# -eq 1 ]; then
-        for SERVER in ${SERVER_LIST}; do
-            if [ $SERVER = $PARM1 ]; then
-                echoG "Server set to $SERVER"
-                return 0
-            fi
-        done
-        fail_exit_fatal "Must be called with no parameters for all servers or a valid server"
-    elif [ $# -gt 1 ]; then
-        fail_exit_fatal "Must be called with no parameters for all servers or a valid server"
-    fi
-    SERVER=$SERVERS_ALL
-    echoG "Server set to $SERVER"
-    return 0
-}
 if [ $# -eq 1 ]; then
-    PARM1=$1
+    for SERVER in ${SERVER_LIST}; do
+        if [ $SERVER = $PARM1 ]; then
+            echoG "Server set to $SERVER"
+            break;
+        fi
+    done
+    fail_exit_fatal "Must be called with no parameters for all servers or a valid server"
+elif [ $# -gt 1 ]; then
+    fail_exit_fatal "Must be called with no parameters for all servers or a valid server"
+else
+    SERVER=$SERVERS_ALL
 fi
-validate_command_line
 echoG "Server set to $SERVER"
 
 validate_servers(){
