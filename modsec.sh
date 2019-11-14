@@ -94,13 +94,17 @@ check_system(){
 check_system
 
 if [ $# -eq 1 ]; then
+    FOUND=0
     for SERVER in ${SERVER_LIST}; do
         if [ "$SERVER" = "$1" ]; then
             echoG "Server set to $SERVER"
+            FOUND=1
             break;
         fi
     done
-    fail_exit_fatal "Must be called with no parameters for all servers or a valid server"
+    if [ $FOUND -ne 1 ]; then
+        fail_exit_fatal "Must be called with no parameters for all servers or a valid server"
+    fi
 elif [ $# -gt 1 ]; then
     fail_exit_fatal "Must be called with no parameters for all servers or a valid server"
 else
@@ -112,17 +116,17 @@ validate_servers(){
     if [ ! -f $SERVERACCESS ] ; then
         fail_exit_fatal 'Successfully install http2benchmark before installing ModSecurity for it'
     fi
-    if [ $SERVER = $SERVERS_ALL ]; then
+    if [ "$SERVER" = "$SERVERS_ALL" ]; then
         if [ ! -d $APADIR -o ! -d $NGDIR -o ! -d $OLSDIR -o ! -d $LSDIR ] ; then
             fail_exit_fatal 'Successfully install http2benchmark (for Apache, OpenLitespeed, Enterprise Litespeed and Nginx) before installing ModSecurity for it'
         fi
-    elif [ $SERVER = $SERVER_APACHE -a ! -d $APADIR ]; then
+    elif [ "$SERVER" = "$SERVER_APACHE" -a ! -d $APADIR ]; then
         fail_exit_fatal 'Successfully install http2benchmark for Apache before installing ModSecurity for it'
-    elif [ $SERVER = $SERVER_LSWS -a ! -d $LSDIR ]; then
+    elif [ "$SERVER" = "$SERVER_LSWS" -a ! -d $LSDIR ]; then
         fail_exit_fatal 'Successfully install http2benchmark for Litespeed Enterprise before installing ModSecurity for it'
-    elif [ $SERVER = $SERVER_NGINX -a ! -d $NGDIR ]; then
+    elif [ "$SERVER" = "$SERVER_NGINX" -a ! -d $NGDIR ]; then
         fail_exit_fatal 'Successfully install http2benchmark for Nginx before installing ModSecurity for it'
-    elif [ $SERVER = $SERVER_OLS -a ! -d $OLSDIR ]; then
+    elif [ "$SERVER" = "$SERVER_OLS" -a ! -d $OLSDIR ]; then
         fail_exit_fatal 'Successfully install http2benchmark for OpenLitespeed before installing ModSecurity for it'
     fi
 }
@@ -249,22 +253,22 @@ config_olsModSec(){
 main(){
     install_prereq
     install_owasp
-    if [ $SERVER = $SERVERS_ALL -o $SERVER = $SERVER_APACHE ]; then
+    if [ "$SERVER" = "$SERVERS_ALL" -o "$SERVER" = "$SERVER_APACHE" ]; then
         install_apacheModSec
     fi
-    if [ $SERVER = $SERVERS_ALL -o $SERVER = $SERVER_NGINX ]; then
+    if [ "$SERVER" = "$SERVERS_ALL" -o "$SERVER" = "$SERVER_NGINX" ]; then
         install_nginxModSec
     fi
-    if [ $SERVER = $SERVERS_ALL -o $SERVER = $SERVER_APACHE ]; then
+    if [ "$SERVER" = "$SERVERS_ALL" -o "$SERVER" = "$SERVER_APACHE" ]; then
         config_apacheModSec
     fi
-    if [ $SERVER = $SERVERS_ALL -o $SERVER = $SERVER_NGINX ]; then
+    if [ "$SERVER" = "$SERVERS_ALL" -o "$SERVER" = "$SERVER_NGINX" ]; then
         config_nginxModSec
     fi
-    if [ $SERVER = $SERVERS_ALL -o $SERVER = $SERVER_LSWS ]; then
+    if [ "$SERVER" = "$SERVERS_ALL" -o "$SERVER" = "$SERVER_LSWS" ]; then
         config_lswsModSec
     fi
-    if [ $SERVER = $SERVERS_ALL -o $SERVER = $SERVER_OLS ]; then
+    if [ "$SERVER" = "$SERVERS_ALL" -o "$SERVER" = "$SERVER_OLS" ]; then
         config_olsModSec
     fi
     echoG "Installation complete and successful"

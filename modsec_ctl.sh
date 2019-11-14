@@ -92,7 +92,7 @@ if [ $# -lt 1 ] ; then
 elif [ $# -eq 2 ] ; then
     FOUND=0
     for SERVER in ${SERVER_LIST}; do
-        if [ $2 = $SERVER ]; then
+        if [ "$2" = "$SERVER" ]; then
             SERVER_LIST=$SERVER
             FOUND=1
             break
